@@ -1,4 +1,3 @@
-
 # Use a lightweight web server
 FROM nginx:alpine
 
@@ -6,7 +5,7 @@ FROM nginx:alpine
 RUN rm -rf /usr/share/nginx/html/*
 
 # Copy your HTML files to the container
-COPY . /usr/share/nginx/html
+COPY html/ /usr/share/nginx/html/
 
 # Expose port 80
 EXPOSE 80
