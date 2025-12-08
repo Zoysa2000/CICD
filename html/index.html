@@ -5,27 +5,83 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #f3f3f3;
+            background: linear-gradient(to bottom right, #e9f1ff, #f3f3f3);
             padding: 20px;
         }
         h1 {
-            color: #0066cc;
+            color: #0055aa;
+            text-align: center;
         }
-        .msg {
+        .card {
             background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 700px;
+            margin: 20px auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #333;
+            border-left: 4px solid #0055aa;
+            padding-left: 10px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 14px;
+            color: #777;
+        }
+        .highlight {
+            background: #e7f2ff;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #c8dfff;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
+
     <h1>Hello, Docker HTML Demo!</h1>
 
-    <div class="msg">
-        <p>This version was updated in <strong>dev branch</strong>.</p>
-        <p>Hi</p>
+    <div class="card">
+        <div class="section-title">Dev Branch Update</div>
+        <p>This version was updated from the <strong>dev branch</strong>.</p>
+        <p>Hi 👋 This is a test page deployed using Docker.</p>
+
+        <div class="highlight">
+            ✔ Rebuild Docker Image  
+            ✔ Pushed through GitHub Actions  
+            ✔ Auto-deployed latest version  
+        </div>
     </div>
+
+    <div class="card">
+        <div class="section-title">About This Demo</div>
+        <p>
+            This HTML file demonstrates how a simple static web page can be packaged into a Docker image 
+            and deployed using CI/CD pipelines.
+        </p>
+        <ul>
+            <li>GitHub Actions build the Docker image</li>
+            <li>The image is pushed to Docker Hub</li>
+            <li>You can run it anywhere using <code>docker run</code></li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <div class="section-title">Try It Locally</div>
+        <p>Run the container using:</p>
+        <pre>docker run -d -p 8080:80 thilina123/myapp</pre>
+        <p>Then visit: <strong>http://localhost:8080</strong></p>
+    </div>
+
+    <div class="footer">
+        © 2025 Docker Demo | Created in Dev Branch
+    </div>
+
 </body>
 </html>
+
