@@ -58,7 +58,7 @@
         </article>
 
         <article class="card" id="dockerfile" style="margin-top:18px">
-          <h2>Dockerfile <button class="copy" data-target="dockerfile-code">Copy</button></h2>
+          <h2>Dockerfile <button class="copy" data-target="dockerfile-code" aria-label="Copy Dockerfile">Copy</button></h2>
           <p class="small">A minimal multi-stage Dockerfile for serving a static HTML site via nginx (production) and a lightweight dev variant using a simple http server.</p>
           <pre><code id="dockerfile-code">// Dockerfile - Multi-stage
 # Build stage (optional for static site where bundling occurs)
@@ -84,12 +84,11 @@ WORKDIR /app
 COPY . .
 RUN npm i --silent || true
 EXPOSE 3000
-CMD ["npx","http-server","-p","3000"]
-</code></pre>
+CMD ["npx","http-server","-p","3000"]</code></pre>
         </article>
 
         <article class="card" id="compose" style="margin-top:18px">
-          <h2>docker-compose.yml <button class="copy" data-target="compose-code">Copy</button></h2>
+          <h2>docker-compose.yml <button class="copy" data-target="compose-code" aria-label="Copy docker-compose">Copy</button></h2>
           <p class="small">Compose file to run the site locally and an optional reverse-proxy for convenience.</p>
           <pre><code id="compose-code">version: '3.8'
 services:
@@ -102,13 +101,15 @@ services:
       - ./:/usr/share/nginx/html:ro
     restart: unless-stopped
 
-  # Optional: Traefik or another reverse-proxy can be added here for TLS in local env
-</code></pre>
+  # Optional: Traefik or another reverse-proxy can be added here for TLS in local env</code></pre>
         </article>
 
         <article class="card" id="ci" style="margin-top:18px">
-          <h2>GitHub Actions CI <button class="copy" data-target="ci-code">Copy</button></h2>
+          <h2>GitHub Actions CI <button class="copy" data-target="ci-code" aria-label="Copy CI workflow">Copy</button></h2>
           <p class="small">A simple workflow that builds the Docker image, tags it with the commit SHA and pushes to Docker Hub (or GHCR). It runs on pushes to <code>main</code> (or <code>release</code>) branch.</p>
+
+          <!-- If you publish this page with GitHub Pages (Jekyll), wrap the block below with
+               {% raw %} and {% endraw %} so Jekyll doesn't try to process the {{ ... }} Liquid tags. -->
           <pre><code id="ci-code"># .github/workflows/ci-docker.yml
 name: CI - Build & Push Docker
 on:
@@ -144,8 +145,7 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/your-repo:${{ github.sha }}
 
       - name: Image digest
-        run: echo "Image pushed"
-</code></pre>
+        run: echo "Image pushed"</code></pre>
         </article>
 
         <article class="card" id="usage" style="margin-top:18px">
@@ -218,27 +218,48 @@ jobs:
   </div>
 
   <script>
-    // Copy-to-clipboard behavior
+    // Copy-to-clipboard with fallback
+    async function copyText(text) {
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } else {
+          // Fallback: create temporary textarea and execCommand
+          const ta = document.createElement('textarea');
+          ta.value = text;
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          const ok = document.execCommand('copy');
+          document.body.removeChild(ta);
+          return ok;
+        }
+      } catch (e) {
+        return false;
+      }
+    }
+
     document.querySelectorAll('.copy').forEach(btn => {
       btn.addEventListener('click', async () => {
         const id = btn.getAttribute('data-target');
         const el = document.getElementById(id);
         if (!el) return;
-        try {
-          await navigator.clipboard.writeText(el.innerText);
+        const success = await copyText(el.innerText || el.textContent || '');
+        if (success) {
+          const previous = btn.innerText;
           btn.innerText = 'Copied!';
-          setTimeout(() => btn.innerText = 'Copy', 1500);
-        } catch (e) {
+          setTimeout(() => btn.innerText = previous, 1500);
+        } else {
           alert('Copy failed — open devtools and copy manually.');
         }
       });
     });
 
-    // Download instructions (can't create ZIP client-side without extra libs)
     document.getElementById('downloadAll').addEventListener('click', () => {
-      alert('To download as files: create these files in your repo:\n- Dockerfile\n- docker-compose.yml\n- .github/workflows/ci-docker.yml\n- index.html (this file)\nThen commit and push. Use your favorite ZIP tool to archive if needed.');
+      alert('To download as files: create these files in your repo:\\n- Dockerfile\\n- docker-compose.yml\\n- .github/workflows/ci-docker.yml\\n- index.html (this file)\\nThen commit and push. Use your favorite ZIP tool to archive if needed.');
     });
   </script>
 </body>
 </html>
-
