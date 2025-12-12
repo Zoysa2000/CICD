@@ -1,265 +1,87 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Docker + CI Documentation Site</title>
-  <style>
-    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#3b82f6;--glass:rgba(255,255,255,0.03)}
-    html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial}
-    body{background:linear-gradient(180deg,#081226 0%, #071025 100%);color:#e6eef6;padding:28px}
-    .wrap{max-width:1100px;margin:0 auto}
-    header{display:flex;align-items:center;gap:18px}
-    .logo{width:64px;height:64px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#06b6d4);display:flex;align-items:center;justify-content:center;font-weight:700;color:white}
-    h1{margin:0;font-size:26px}
-    p.lead{color:var(--muted);margin-top:6px}
-    nav{margin-top:18px;display:flex;gap:8px;flex-wrap:wrap}
-    .btn{background:var(--glass);border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:8px;color:#dbeafe;text-decoration:none;font-size:13px}
-    main{display:grid;grid-template-columns:1fr 360px;gap:20px;margin-top:22px}
-    .card{background:linear-gradient(180deg,rgba(255,255,255,0.02), transparent);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 6px 20px rgba(2,6,23,0.6)}
-    h2{margin-top:0}
-    pre{background:#021427;padding:12px;border-radius:8px;overflow:auto;color:#c7efff;font-size:13px}
-    code{font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
-    .copy{float:right;background:transparent;border:0;color:var(--accent);cursor:pointer;font-weight:600}
-    .small{font-size:13px;color:var(--muted)}
-    aside .card{position:sticky;top:28px}
-    footer{margin-top:26px;color:var(--muted);font-size:13px}
-    .usage{display:grid;gap:8px}
-    .steps{margin:0;padding-left:18px}
-    .info{background:linear-gradient(90deg, rgba(59,130,246,0.06), rgba(6,182,212,0.03));padding:10px;border-radius:8px;border:1px solid rgba(59,130,246,0.08);color:#dbeafe}
-  </style>
+    <title>Docker HTML Demo - Dev Version</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #e9f1ff, #f3f3f3);
+            padding: 20px;
+        }
+        h1 {
+            color: #0055aa;
+            text-align: center;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 700px;
+            margin: 20px auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #333;
+            border-left: 4px solid #0055aa;
+            padding-left: 10px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 14px;
+            color: #777;
+        }
+        .highlight {
+            background: #e7f2ff;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #c8dfff;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="logo">D•CI</div>
-      <div>
-        <h1>Docker + CI — Example Documentation</h1>
-        <p class="lead">Simple documentation website containing example Dockerfile, docker-compose and CI (GitHub Actions) config with usage steps and copy buttons.</p>
-      </div>
-    </header>
 
-    <nav>
-      <a class="btn" href="#dockerfile">Dockerfile</a>
-      <a class="btn" href="#compose">docker-compose.yml</a>
-      <a class="btn" href="#ci">GitHub Actions CI</a>
-      <a class="btn" href="#usage">Usage</a>
-      <a class="btn" href="#advanced">Advanced</a>
-    </nav>
+    <h1>Hello, Docker HTML Demo!</h1>
 
-    <main>
-      <section>
-        <article class="card" id="intro">
-          <h2>Overview</h2>
-          <p class="small">This single-file documentation site demonstrates the files and steps needed to containerize a static HTML site and set up a simple CI pipeline (GitHub Actions) that builds and publishes a Docker image to Docker Hub (or GitHub Container Registry).</p>
-          <div style="margin-top:12px" class="info">
-            Tip: Replace placeholder names (e.g. <code>YOUR_DOCKERHUB_USERNAME</code>, <code>your-repo</code>) with your real values before using the workflow.
-          </div>
-        </article>
+    <div class="card">
+        <div class="section-title">Dev Branch Update</div>
+        <p>This version was updated from the <strong>dev branch</strong>.</p>
+        <p>Hi 👋 This is a test page deployed using Docker.</p>
 
-        <article class="card" id="dockerfile" style="margin-top:18px">
-          <h2>Dockerfile <button class="copy" data-target="dockerfile-code" aria-label="Copy Dockerfile">Copy</button></h2>
-          <p class="small">A minimal multi-stage Dockerfile for serving a static HTML site via nginx (production) and a lightweight dev variant using a simple http server.</p>
-          <pre><code id="dockerfile-code">// Dockerfile - Multi-stage
-# Build stage (optional for static site where bundling occurs)
-FROM node:18-alpine AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --silent || true
-COPY . .
-RUN [ -f package.json ] && npm run build || echo "no build step"
-
-# Production stage
-FROM nginx:stable-alpine AS prod
-COPY --from=build /app/dist/ /usr/share/nginx/html/
-# If there is no build output, copy the repo root (index.html) instead
-RUN [ -d /usr/share/nginx/html ] || true
-COPY ./ /usr/share/nginx/html/
-EXPOSE 80
-CMD ["nginx","-g","daemon off;"]
-
-# Development stage (optional)
-FROM node:18-alpine AS dev
-WORKDIR /app
-COPY . .
-RUN npm i --silent || true
-EXPOSE 3000
-CMD ["npx","http-server","-p","3000"]</code></pre>
-        </article>
-
-        <article class="card" id="compose" style="margin-top:18px">
-          <h2>docker-compose.yml <button class="copy" data-target="compose-code" aria-label="Copy docker-compose">Copy</button></h2>
-          <p class="small">Compose file to run the site locally and an optional reverse-proxy for convenience.</p>
-          <pre><code id="compose-code">version: '3.8'
-services:
-  web:
-    build: .
-    image: your-repo/static-site:dev
-    ports:
-      - "8080:80"
-    volumes:
-      - ./:/usr/share/nginx/html:ro
-    restart: unless-stopped
-
-  # Optional: Traefik or another reverse-proxy can be added here for TLS in local env</code></pre>
-        </article>
-
-        <article class="card" id="ci" style="margin-top:18px">
-          <h2>GitHub Actions CI <button class="copy" data-target="ci-code" aria-label="Copy CI workflow">Copy</button></h2>
-          <p class="small">A simple workflow that builds the Docker image, tags it with the commit SHA and pushes to Docker Hub (or GHCR). It runs on pushes to <code>main</code> (or <code>release</code>) branch.</p>
-
-          <!-- If you publish this page with GitHub Pages (Jekyll), wrap the block below with
-               {% raw %} and {% endraw %} so Jekyll doesn't try to process the {{ ... }} Liquid tags. -->
-          <pre><code id="ci-code"># .github/workflows/ci-docker.yml
-name: CI - Build & Push Docker
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/your-repo:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/your-repo:${{ github.sha }}
-
-      - name: Image digest
-        run: echo "Image pushed"</code></pre>
-        </article>
-
-        <article class="card" id="usage" style="margin-top:18px">
-          <h2>Usage</h2>
-          <div class="usage small">
-            <div>
-              <strong>Locally with Docker</strong>
-              <ol class="steps">
-                <li>Build image: <code>docker build -t static-site:dev .</code></li>
-                <li>Run container: <code>docker run --rm -p 8080:80 static-site:dev</code></li>
-                <li>Open <code>http://localhost:8080</code></li>
-              </ol>
-            </div>
-
-            <div>
-              <strong>With docker-compose</strong>
-              <ol class="steps">
-                <li><code>docker-compose up --build</code></li>
-                <li>Open <code>http://localhost:8080</code></li>
-              </ol>
-            </div>
-
-            <div>
-              <strong>CI Setup (GitHub Actions)</strong>
-              <ol class="steps">
-                <li>Create GitHub secrets: <code>DOCKERHUB_USERNAME</code> and <code>DOCKERHUB_TOKEN</code>.</li>
-                <li>Push to <code>main</code> to trigger build & push.</li>
-              </ol>
-            </div>
-          </div>
-        </article>
-
-        <article class="card" id="advanced" style="margin-top:18px">
-          <h2>Advanced tips</h2>
-          <ul class="small">
-            <li>Use GitHub Container Registry (GHCR) by swapping login & tags to <code>ghcr.io/${{ github.repository }}</code>.</li>
-            <li>Add automated tests prior to pushing the image (lint, unit tests, accessibility checks).</li>
-            <li>Use tags like <code>v1.0.0</code> and GitHub Releases to control production deployments.</li>
-            <li>For production, add a small healthcheck and non-root user in the Dockerfile.</li>
-          </ul>
-        </article>
-      </section>
-
-      <aside>
-        <div class="card">
-          <h3>Quick references</h3>
-          <p class="small"><strong>Files included:</strong></p>
-          <ul class="small">
-            <li>Dockerfile (multi-stage)</li>
-            <li>docker-compose.yml</li>
-            <li>.github/workflows/ci-docker.yml</li>
-          </ul>
-
-          <hr style="border:0;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0">
-          <p class="small"><strong>Copy buttons</strong> appear on each file panel — click to copy that snippet to clipboard.</p>
-
-          <hr style="border:0;border-top:1px solid rgba(255,255,255,0.03);margin:12px 0">
-          <p class="small">Want this as separate files? Download instructions are below.</p>
-
-          <div style="margin-top:12px">
-            <button class="btn" id="downloadAll">Download all as a ZIP (instructions)</button>
-          </div>
+        <div class="highlight">
+            ✔ Rebuild Docker Image  
+            ✔ Pushed through GitHub Actions  
+            ✔ Auto-deployed latest version  
         </div>
-      </aside>
-    </main>
+    </div>
 
-    <footer>
-      <div class="small">Generated example documentation • Replace placeholders before using in production.</div>
-    </footer>
-  </div>
+    <div class="card">
+        <div class="section-title">About This Demo</div>
+        <p>
+            This HTML file demonstrates how a simple static web page can be packaged into a Docker image 
+            and deployed using CI/CD pipelines.
+        </p>
+        <ul>
+            <li>GitHub Actions build the Docker image</li>
+            <li>The image is pushed to Docker Hub</li>
+            <li>You can run it anywhere using <code>docker run</code></li>
+        </ul>
+    </div>
 
-  <script>
-    // Copy-to-clipboard with fallback
-    async function copyText(text) {
-      try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(text);
-          return true;
-        } else {
-          // Fallback: create temporary textarea and execCommand
-          const ta = document.createElement('textarea');
-          ta.value = text;
-          ta.style.position = 'fixed';
-          ta.style.left = '-9999px';
-          document.body.appendChild(ta);
-          ta.select();
-          const ok = document.execCommand('copy');
-          document.body.removeChild(ta);
-          return ok;
-        }
-      } catch (e) {
-        return false;
-      }
-    }
+    <div class="card">
+        <div class="section-title">Try It Locally</div>
+        <p>Run the container using:</p>
+        <pre>docker run -d -p 8080:80 thilina123/myapp</pre>
+        <p>Then visit: <strong>http://localhost:8080</strong></p>
+    </div>
 
-    document.querySelectorAll('.copy').forEach(btn => {
-      btn.addEventListener('click', async () => {
-        const id = btn.getAttribute('data-target');
-        const el = document.getElementById(id);
-        if (!el) return;
-        const success = await copyText(el.innerText || el.textContent || '');
-        if (success) {
-          const previous = btn.innerText;
-          btn.innerText = 'Copied!';
-          setTimeout(() => btn.innerText = previous, 1500);
-        } else {
-          alert('Copy failed — open devtools and copy manually.');
-        }
-      });
-    });
+    <div class="footer">
+        © 2025 Docker Demo | Created in Dev Branch
+    </div>
 
-    document.getElementById('downloadAll').addEventListener('click', () => {
-      alert('To download as files: create these files in your repo:\\n- Dockerfile\\n- docker-compose.yml\\n- .github/workflows/ci-docker.yml\\n- index.html (this file)\\nThen commit and push. Use your favorite ZIP tool to archive if needed.');
-    });
-  </script>
 </body>
 </html>
+
